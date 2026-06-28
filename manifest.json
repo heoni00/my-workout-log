@@ -1,0 +1,20 @@
+{
+  "name": "내 운동일지",
+  "short_name": "운동일지",
+  "description": "운동 세트, 음식 칼로리, 하루 느낌을 날짜별로 기록하는 개인 운동일지",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#17181d",
+  "theme_color": "#17181d",
+  "lang": "ko",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
