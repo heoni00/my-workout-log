@@ -1,70 +1,82 @@
-const STORAGE_KEY = "my-workout-log-v1";
+const STORAGE_KEY = "my-workout-log-v2";
+const LEGACY_KEY = "my-workout-log-v1";
 
-const exercisePresets = [
-  "스쿼트",
-  "벤치프레스",
-  "데드리프트",
-  "숄더프레스",
-  "랫풀다운",
-  "바벨로우",
-  "런지",
-  "러닝"
-];
-
+const exercisePresets = ["스쿼트", "벤치프레스", "데드리프트", "숄더프레스", "랫풀다운", "바벨로우", "런지", "러닝"];
 const mealPresets = [
-  { name: "밥 한 공기", calories: 300 },
-  { name: "닭가슴살", calories: 120 },
-  { name: "계란 2개", calories: 150 },
-  { name: "프로틴", calories: 120 },
-  { name: "바나나", calories: 90 },
-  { name: "샐러드", calories: 180 }
+  { type: "아침", time: "08:00", name: "그릭요거트", calories: 180 },
+  { type: "점심", time: "12:30", name: "닭가슴살 덮밥", calories: 520 },
+  { type: "저녁", time: "19:00", name: "연어 샐러드", calories: 430 },
+  { type: "간식", time: "16:00", name: "프로틴", calories: 120 }
 ];
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
 
 const els = {
-  selectedDayName: $("#selectedDayName"),
-  selectedDateText: $("#selectedDateText"),
-  datePickerBtn: $("#datePickerBtn"),
-  dateInput: $("#dateInput"),
+  todayBtn: $("#todayBtn"),
   prevDayBtn: $("#prevDayBtn"),
   nextDayBtn: $("#nextDayBtn"),
-  todayBtn: $("#todayBtn"),
-  todayVolume: $("#todayVolume"),
-  todaySets: $("#todaySets"),
-  todayCalories: $("#todayCalories"),
-  saveState: $("#saveState"),
-  exerciseQuick: $("#exerciseQuick"),
-  mealQuick: $("#mealQuick"),
-  workoutList: $("#workoutList"),
-  mealList: $("#mealList"),
-  addWorkoutBtn: $("#addWorkoutBtn"),
-  addMealBtn: $("#addMealBtn"),
-  moodInput: $("#moodInput"),
-  intensityInput: $("#intensityInput"),
-  intensityLabel: $("#intensityLabel"),
-  noteInput: $("#noteInput"),
-  saveBtn: $("#saveBtn"),
-  deleteDayBtn: $("#deleteDayBtn"),
-  calendarGrid: $("#calendarGrid"),
+  datePickerBtn: $("#datePickerBtn"),
+  dateInput: $("#dateInput"),
+  selectedDayName: $("#selectedDayName"),
+  selectedDateText: $("#selectedDateText"),
+  todayInfo: $("#todayInfo"),
+  latestWorkoutTitle: $("#latestWorkoutTitle"),
+  latestWorkoutMeta: $("#latestWorkoutMeta"),
+  latestBodyTitle: $("#latestBodyTitle"),
+  latestBodyMeta: $("#latestBodyMeta"),
+  homeWorkoutSummary: $("#homeWorkoutSummary"),
+  homeMealSummary: $("#homeMealSummary"),
+  homeNoteSummary: $("#homeNoteSummary"),
+  monthCount: $("#monthCount"),
   monthLabel: $("#monthLabel"),
-  monthWorkoutCount: $("#monthWorkoutCount"),
+  calendarGrid: $("#calendarGrid"),
   prevMonthBtn: $("#prevMonthBtn"),
   nextMonthBtn: $("#nextMonthBtn"),
   selectedSummaryTitle: $("#selectedSummaryTitle"),
   selectedSummaryBody: $("#selectedSummaryBody"),
-  monthWorkoutDays: $("#monthWorkoutDays"),
-  streakDays: $("#streakDays"),
-  totalVolume: $("#totalVolume"),
-  topExercises: $("#topExercises"),
-  recentEntries: $("#recentEntries"),
+  saveState: $("#saveState"),
+  workoutStartInput: $("#workoutStartInput"),
+  workoutEndInput: $("#workoutEndInput"),
+  workoutDuration: $("#workoutDuration"),
+  exerciseQuick: $("#exerciseQuick"),
+  workoutList: $("#workoutList"),
+  addWorkoutBtn: $("#addWorkoutBtn"),
+  moodInput: $("#moodInput"),
+  intensityInput: $("#intensityInput"),
+  intensityLabel: $("#intensityLabel"),
+  workoutMemoInput: $("#workoutMemoInput"),
+  saveWorkoutBtn: $("#saveWorkoutBtn"),
+  deleteWorkoutBtn: $("#deleteWorkoutBtn"),
+  mealTotalChip: $("#mealTotalChip"),
+  mealQuick: $("#mealQuick"),
+  mealList: $("#mealList"),
+  addMealBtn: $("#addMealBtn"),
+  saveMealsBtn: $("#saveMealsBtn"),
+  deleteMealsBtn: $("#deleteMealsBtn"),
+  bodyHistoryCount: $("#bodyHistoryCount"),
+  bodyDateInput: $("#bodyDateInput"),
+  bodyWeightInput: $("#bodyWeightInput"),
+  bodyMuscleInput: $("#bodyMuscleInput"),
+  bodyFatInput: $("#bodyFatInput"),
+  bodyFatPercentInput: $("#bodyFatPercentInput"),
+  bodyMemoInput: $("#bodyMemoInput"),
+  addBodyBtn: $("#addBodyBtn"),
+  bodyHistory: $("#bodyHistory"),
+  noteCountChip: $("#noteCountChip"),
+  infoDateInput: $("#infoDateInput"),
+  infoCategoryInput: $("#infoCategoryInput"),
+  infoTitleInput: $("#infoTitleInput"),
+  infoUrlInput: $("#infoUrlInput"),
+  infoMemoInput: $("#infoMemoInput"),
+  addInfoNoteBtn: $("#addInfoNoteBtn"),
+  infoNoteList: $("#infoNoteList"),
   exportBtn: $("#exportBtn"),
   importInput: $("#importInput"),
-  toast: $("#toast"),
   workoutTemplate: $("#workoutTemplate"),
   mealTemplate: $("#mealTemplate"),
-  exerciseNames: $("#exerciseNames")
+  exerciseNames: $("#exerciseNames"),
+  toast: $("#toast")
 };
 
 let state = loadState();
@@ -78,64 +90,21 @@ function init() {
   renderPresetButtons();
   renderExerciseDatalist();
   bindEvents();
-  switchView("log");
-  setSelectedDate(selectedDate, { keepCalendar: false });
+  switchView("home");
+  setSelectedDate(selectedDate, { keepCalendar: false, quiet: true });
   registerServiceWorker();
 }
 
 function bindEvents() {
+  els.todayBtn.addEventListener("click", () => setSelectedDate(toISODate(new Date()), { keepCalendar: false }));
   els.prevDayBtn.addEventListener("click", () => shiftSelectedDay(-1));
   els.nextDayBtn.addEventListener("click", () => shiftSelectedDay(1));
-  els.todayBtn.addEventListener("click", () => setSelectedDate(toISODate(new Date()), { keepCalendar: false }));
   els.datePickerBtn.addEventListener("click", () => {
-    if (typeof els.dateInput.showPicker === "function") {
-      els.dateInput.showPicker();
-    } else {
-      els.dateInput.focus();
-    }
+    if (typeof els.dateInput.showPicker === "function") els.dateInput.showPicker();
+    else els.dateInput.focus();
   });
   els.dateInput.addEventListener("change", () => {
     if (els.dateInput.value) setSelectedDate(els.dateInput.value, { keepCalendar: false });
-  });
-
-  els.addWorkoutBtn.addEventListener("click", () => addWorkout());
-  els.addMealBtn.addEventListener("click", () => addMeal());
-
-  els.workoutList.addEventListener("input", handleWorkoutInput);
-  els.mealList.addEventListener("input", handleMealInput);
-  els.workoutList.addEventListener("click", handleWorkoutClick);
-  els.mealList.addEventListener("click", handleMealClick);
-
-  els.moodInput.addEventListener("change", () => {
-    currentEntry().mood = els.moodInput.value;
-    scheduleSave();
-  });
-  els.intensityInput.addEventListener("input", () => {
-    els.intensityLabel.textContent = els.intensityInput.value;
-    currentEntry().intensity = Number(els.intensityInput.value);
-    scheduleSave();
-  });
-  els.noteInput.addEventListener("input", () => {
-    currentEntry().note = els.noteInput.value;
-    scheduleSave();
-  });
-
-  els.saveBtn.addEventListener("click", () => {
-    persistNow();
-    showToast("기록을 저장했어요.");
-  });
-
-  els.deleteDayBtn.addEventListener("click", () => {
-    if (!hasEntryContent(currentEntry())) {
-      showToast("삭제할 기록이 없어요.");
-      return;
-    }
-    const ok = window.confirm("선택한 날짜의 기록을 삭제할까요?");
-    if (!ok) return;
-    delete state.entries[selectedDate];
-    persistNow();
-    renderAll();
-    showToast("선택한 날짜 기록을 삭제했어요.");
   });
 
   els.prevMonthBtn.addEventListener("click", () => {
@@ -146,17 +115,52 @@ function bindEvents() {
     calendarCursor = addMonths(calendarCursor, 1);
     renderCalendar();
   });
-
   els.calendarGrid.addEventListener("click", (event) => {
     const day = event.target.closest(".calendar-day");
     if (!day) return;
     setSelectedDate(day.dataset.date, { keepCalendar: true });
-    switchView("calendar");
   });
 
-  $$(".nav-btn").forEach((button) => {
-    button.addEventListener("click", () => switchView(button.dataset.view));
+  $$(".nav-btn").forEach((button) => button.addEventListener("click", () => switchView(button.dataset.view)));
+
+  els.workoutStartInput.addEventListener("input", updateWorkoutMeta);
+  els.workoutEndInput.addEventListener("input", updateWorkoutMeta);
+  els.addWorkoutBtn.addEventListener("click", () => addWorkout());
+  els.workoutList.addEventListener("input", handleWorkoutInput);
+  els.workoutList.addEventListener("click", handleWorkoutClick);
+  els.moodInput.addEventListener("change", () => {
+    currentEntry().mood = els.moodInput.value;
+    scheduleSave();
   });
+  els.intensityInput.addEventListener("input", () => {
+    els.intensityLabel.textContent = els.intensityInput.value;
+    currentEntry().intensity = Number(els.intensityInput.value);
+    scheduleSave();
+  });
+  els.workoutMemoInput.addEventListener("input", () => {
+    currentEntry().workoutMemo = els.workoutMemoInput.value;
+    scheduleSave();
+  });
+  els.saveWorkoutBtn.addEventListener("click", () => {
+    persistNow();
+    showToast("운동을 저장했어요.");
+  });
+  els.deleteWorkoutBtn.addEventListener("click", deleteWorkoutForDay);
+
+  els.addMealBtn.addEventListener("click", () => addMeal());
+  els.mealList.addEventListener("input", handleMealInput);
+  els.mealList.addEventListener("change", handleMealInput);
+  els.mealList.addEventListener("click", handleMealClick);
+  els.saveMealsBtn.addEventListener("click", () => {
+    persistNow();
+    showToast("식단을 저장했어요.");
+  });
+  els.deleteMealsBtn.addEventListener("click", deleteMealsForDay);
+
+  els.addBodyBtn.addEventListener("click", addBodyRecord);
+  els.bodyHistory.addEventListener("click", handleBodyDelete);
+  els.addInfoNoteBtn.addEventListener("click", addInfoNote);
+  els.infoNoteList.addEventListener("click", handleInfoNoteDelete);
 
   els.exportBtn.addEventListener("click", exportData);
   els.importInput.addEventListener("change", importData);
@@ -171,12 +175,11 @@ function renderPresetButtons() {
     button.addEventListener("click", () => addWorkout({ name, sets: 3 }));
     els.exerciseQuick.append(button);
   });
-
   mealPresets.forEach((meal) => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "quick-chip";
-    button.textContent = `${meal.name} ${meal.calories}`;
+    button.textContent = `${meal.type} ${meal.name}`;
     button.addEventListener("click", () => addMeal(meal));
     els.mealQuick.append(button);
   });
@@ -192,15 +195,9 @@ function renderExerciseDatalist() {
 }
 
 function switchView(viewName) {
-  $$(".view").forEach((view) => {
-    view.classList.toggle("is-active", view.id === `view-${viewName}`);
-  });
-  $$(".nav-btn").forEach((button) => {
-    button.classList.toggle("is-active", button.dataset.view === viewName);
-  });
-
-  if (viewName === "calendar") renderCalendar();
-  if (viewName === "stats") renderStats();
+  $$(".view").forEach((view) => view.classList.toggle("is-active", view.id === `view-${viewName}`));
+  $$(".nav-btn").forEach((button) => button.classList.toggle("is-active", button.dataset.view === viewName));
+  renderAll();
 }
 
 function setSelectedDate(dateString, options = {}) {
@@ -208,47 +205,81 @@ function setSelectedDate(dateString, options = {}) {
   state.selectedDate = selectedDate;
   ensureEntry(selectedDate);
   els.dateInput.value = selectedDate;
+  els.bodyDateInput.value = selectedDate;
+  els.infoDateInput.value = selectedDate;
   if (!options.keepCalendar) calendarCursor = firstDayOfMonth(parseISODate(selectedDate));
-  persistNow({ quiet: true });
+  persistNow({ quiet: options.quiet ?? true });
   renderAll();
 }
 
 function shiftSelectedDay(amount) {
-  const next = addDays(parseISODate(selectedDate), amount);
-  setSelectedDate(toISODate(next), { keepCalendar: false });
+  setSelectedDate(toISODate(addDays(parseISODate(selectedDate), amount)), { keepCalendar: false });
 }
 
 function renderAll() {
   renderDateHeader();
-  renderEntry();
-  renderTodaySummary();
+  renderHome();
+  renderWorkoutPage();
+  renderMealsPage();
+  renderBodyPage();
+  renderNotesPage();
   renderCalendar();
-  renderStats();
+  renderSelectedSummary();
 }
 
 function renderDateHeader() {
   const date = parseISODate(selectedDate);
   els.selectedDayName.textContent = relativeDayName(date);
   els.selectedDateText.textContent = formatFullDate(date);
+  els.todayInfo.textContent = formatLongDate(new Date());
 }
 
-function renderEntry() {
+function renderHome() {
   const entry = currentEntry();
+  const totals = summarizeEntry(entry);
+  const notesForDate = state.infoNotes.filter((note) => note.date === selectedDate).length;
+  els.homeWorkoutSummary.textContent = `${totals.sets}세트`;
+  els.homeMealSummary.textContent = `${formatNumber(totals.calories)} kcal`;
+  els.homeNoteSummary.textContent = `${notesForDate}개`;
+
+  const recentWorkout = findLatestWorkout();
+  if (recentWorkout) {
+    const days = daysBetween(parseISODate(recentWorkout.date), new Date());
+    els.latestWorkoutTitle.textContent = recentWorkout.names || "운동 기록";
+    els.latestWorkoutMeta.textContent = days === 0 ? "오늘 운동했어요" : `${days}일 전 운동`;
+  } else {
+    els.latestWorkoutTitle.textContent = "아직 기록 없음";
+    els.latestWorkoutMeta.textContent = "운동 페이지에서 시작해요";
+  }
+
+  const latestBody = latestBodyRecord();
+  if (latestBody) {
+    els.latestBodyTitle.textContent = `${cleanNumber(latestBody.weight)}kg`;
+    els.latestBodyMeta.textContent = `근육 ${emptyDash(latestBody.muscle)}kg · 지방 ${emptyDash(latestBody.fatPercent)}%`;
+  } else {
+    els.latestBodyTitle.textContent = "인바디 없음";
+    els.latestBodyMeta.textContent = "몸 상태 페이지에서 등록";
+  }
+}
+
+function renderWorkoutPage() {
+  const entry = currentEntry();
+  els.workoutStartInput.value = entry.workoutStart || "";
+  els.workoutEndInput.value = entry.workoutEnd || "";
+  renderWorkoutDuration();
   renderWorkoutList(entry.workouts);
-  renderMealList(entry.meals);
   els.moodInput.value = entry.mood || "";
   els.intensityInput.value = String(entry.intensity || 5);
   els.intensityLabel.textContent = String(entry.intensity || 5);
-  els.noteInput.value = entry.note || "";
+  els.workoutMemoInput.value = entry.workoutMemo || "";
 }
 
 function renderWorkoutList(workouts) {
   els.workoutList.innerHTML = "";
   if (!workouts.length) {
-    els.workoutList.append(emptyMessage("운동을 추가하면 kg, 횟수, 세트를 기록할 수 있어요."));
+    els.workoutList.append(emptyMessage("운동 기록이 없어요."));
     return;
   }
-
   workouts.forEach((item) => {
     const node = els.workoutTemplate.content.firstElementChild.cloneNode(true);
     node.dataset.id = item.id;
@@ -260,43 +291,97 @@ function renderWorkoutList(workouts) {
   });
 }
 
+function renderMealsPage() {
+  const entry = currentEntry();
+  renderMealList(entry.meals);
+  renderMealTotal();
+}
+
+function renderMealTotal() {
+  els.mealTotalChip.textContent = `${formatNumber(summarizeEntry(currentEntry()).calories)} kcal`;
+}
+
 function renderMealList(meals) {
   els.mealList.innerHTML = "";
   if (!meals.length) {
-    els.mealList.append(emptyMessage("먹은 음식과 대략적인 kcal를 가볍게 남겨보세요."));
+    els.mealList.append(emptyMessage("식단 기록이 없어요."));
     return;
   }
-
   meals.forEach((item) => {
     const node = els.mealTemplate.content.firstElementChild.cloneNode(true);
     node.dataset.id = item.id;
+    $('[data-field="type"]', node).value = item.type || "아침";
+    $('[data-field="time"]', node).value = item.time || "";
     $('[data-field="name"]', node).value = item.name || "";
     $('[data-field="calories"]', node).value = cleanNumber(item.calories);
     els.mealList.append(node);
   });
 }
 
-function renderTodaySummary() {
-  const totals = summarizeEntry(currentEntry());
-  els.todayVolume.textContent = `${formatNumber(totals.volume)} kg`;
-  els.todaySets.textContent = String(totals.sets);
-  els.todayCalories.textContent = `${formatNumber(totals.calories)} kcal`;
+function renderBodyPage() {
+  els.bodyDateInput.value ||= selectedDate;
+  els.bodyHistoryCount.textContent = `${state.bodyRecords.length}개`;
+  els.bodyHistory.innerHTML = "";
+  const records = [...state.bodyRecords].sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
+  if (!records.length) {
+    els.bodyHistory.append(emptyMessage("인바디 기록이 없어요."));
+    return;
+  }
+  records.forEach((record) => {
+    const item = document.createElement("article");
+    item.className = "history-item";
+    item.innerHTML = `
+      <div>
+        <strong>${escapeHTML(formatShortDate(parseISODate(record.date)))}</strong>
+        <span>${emptyDash(record.weight)}kg · 근육 ${emptyDash(record.muscle)}kg · 지방 ${emptyDash(record.fat)}kg · ${emptyDash(record.fatPercent)}%</span>
+        ${record.memo ? `<p>${escapeHTML(record.memo)}</p>` : ""}
+      </div>
+      <button class="icon-btn remove-row" type="button" data-id="${record.id}" aria-label="인바디 삭제"><svg><use href="#icon-trash"></use></svg></button>
+    `;
+    els.bodyHistory.append(item);
+  });
+}
+
+function renderNotesPage() {
+  els.infoDateInput.value ||= selectedDate;
+  els.noteCountChip.textContent = `${state.infoNotes.length}개`;
+  els.infoNoteList.innerHTML = "";
+  const notes = [...state.infoNotes].sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
+  if (!notes.length) {
+    els.infoNoteList.append(emptyMessage("저장한 메모가 없어요."));
+    return;
+  }
+  notes.forEach((note) => {
+    const item = document.createElement("article");
+    item.className = "note-item";
+    const url = normalizeUrl(note.url || "");
+    item.innerHTML = `
+      <div>
+        <div class="note-topline"><span>${escapeHTML(note.category || "기타")}</span><time>${escapeHTML(formatShortDate(parseISODate(note.date)))}</time></div>
+        <strong>${escapeHTML(note.title || "제목 없음")}</strong>
+        ${note.memo ? `<p>${escapeHTML(note.memo)}</p>` : ""}
+        ${url ? `<a href="${escapeHTML(url)}" target="_blank" rel="noopener"><svg><use href="#icon-link"></use></svg>${escapeHTML(url)}</a>` : ""}
+      </div>
+      <button class="icon-btn remove-row" type="button" data-id="${note.id}" aria-label="메모 삭제"><svg><use href="#icon-trash"></use></svg></button>
+    `;
+    els.infoNoteList.append(item);
+  });
 }
 
 function renderCalendar() {
   const year = calendarCursor.getFullYear();
   const month = calendarCursor.getMonth();
   els.monthLabel.textContent = `${year}년 ${month + 1}월`;
+  els.calendarGrid.innerHTML = "";
 
-  const days = [];
   const first = new Date(year, month, 1);
   const start = addDays(first, -first.getDay());
-  for (let i = 0; i < 42; i += 1) days.push(addDays(start, i));
-
-  els.calendarGrid.innerHTML = "";
-  days.forEach((date) => {
+  for (let i = 0; i < 42; i += 1) {
+    const date = addDays(start, i);
     const dateString = toISODate(date);
     const entry = state.entries[dateString] || blankEntry();
+    const hasBody = state.bodyRecords.some((record) => record.date === dateString);
+    const hasNote = state.infoNotes.some((note) => note.date === dateString);
     const totals = summarizeEntry(entry);
     const day = document.createElement("button");
     day.type = "button";
@@ -305,151 +390,57 @@ function renderCalendar() {
     day.classList.toggle("is-outside", date.getMonth() !== month);
     day.classList.toggle("is-today", dateString === toISODate(new Date()));
     day.classList.toggle("is-selected", dateString === selectedDate);
-
-    const label = document.createElement("span");
-    label.textContent = String(date.getDate());
-    const small = document.createElement("small");
-    small.textContent = totals.calories ? `${formatCompact(totals.calories)}k` : "";
+    day.innerHTML = `<span>${date.getDate()}</span><small>${totals.calories ? `${formatCompact(totals.calories)}k` : ""}</small>`;
     const dots = document.createElement("div");
     dots.className = "day-dots";
-    if (totals.sets) dots.append(dot("workout"));
-    if (totals.calories) dots.append(dot("food"));
-    if ((entry.note || "").trim()) dots.append(dot("note"));
-    day.append(label, small, dots);
+    if (hasWorkout(entry)) dots.append(dot("workout"));
+    if ((entry.meals || []).length) dots.append(dot("food"));
+    if (hasBody) dots.append(dot("body"));
+    if (hasNote || (entry.workoutMemo || "").trim()) dots.append(dot("note"));
+    day.append(dots);
     els.calendarGrid.append(day);
-  });
+  }
 
-  const monthDates = Object.keys(state.entries).filter((date) => {
+  const monthWorkoutDays = Object.entries(state.entries).filter(([date, entry]) => {
     const parsed = parseISODate(date);
-    return parsed.getFullYear() === year && parsed.getMonth() === month && hasWorkout(state.entries[date]);
-  });
-  els.monthWorkoutCount.textContent = `${monthDates.length}일 운동`;
-  renderSelectedSummary();
+    return parsed.getFullYear() === year && parsed.getMonth() === month && hasWorkout(entry);
+  }).length;
+  els.monthCount.textContent = `${monthWorkoutDays}일 운동`;
 }
 
 function renderSelectedSummary() {
   const entry = currentEntry();
   const totals = summarizeEntry(entry);
+  const body = state.bodyRecords.filter((record) => record.date === selectedDate).at(-1);
+  const notes = state.infoNotes.filter((note) => note.date === selectedDate);
   els.selectedSummaryTitle.textContent = formatShortDate(parseISODate(selectedDate));
   els.selectedSummaryBody.innerHTML = "";
-
-  if (!hasEntryContent(entry)) {
-    els.selectedSummaryBody.append(emptyMessage("이 날짜에는 아직 기록이 없어요."));
+  if (!hasDayContent(selectedDate)) {
+    els.selectedSummaryBody.append(emptyMessage("선택한 날짜 기록이 없어요."));
     return;
   }
-
-  const workoutText = entry.workouts.length
-    ? entry.workouts.map((item) => `${item.name || "운동"} ${cleanNumber(item.weight)}kg x ${cleanNumber(item.reps)}회 x ${cleanNumber(item.sets || 1)}세트`).join(", ")
-    : "운동 기록 없음";
-  els.selectedSummaryBody.append(summaryItem("운동", workoutText));
-
-  const mealText = entry.meals.length
-    ? entry.meals.map((item) => `${item.name || "음식"} ${cleanNumber(item.calories)}kcal`).join(", ")
-    : "음식 기록 없음";
-  els.selectedSummaryBody.append(summaryItem("음식", `${mealText} · 총 ${formatNumber(totals.calories)}kcal`));
-
-  const note = [entry.mood, entry.intensity ? `강도 ${entry.intensity}/10` : "", entry.note]
-    .filter(Boolean)
-    .join(" · ");
-  els.selectedSummaryBody.append(summaryItem("느낌", note || "메모 없음"));
-}
-
-function renderStats() {
-  const entries = Object.entries(state.entries)
-    .filter(([, entry]) => hasEntryContent(entry))
-    .sort(([a], [b]) => b.localeCompare(a));
-  const now = parseISODate(selectedDate);
-  const monthWorkoutDays = entries.filter(([date, entry]) => {
-    const parsed = parseISODate(date);
-    return parsed.getFullYear() === now.getFullYear() && parsed.getMonth() === now.getMonth() && hasWorkout(entry);
-  }).length;
-  const totalVolume = entries.reduce((sum, [, entry]) => sum + summarizeEntry(entry).volume, 0);
-
-  els.monthWorkoutDays.textContent = `${monthWorkoutDays}일`;
-  els.streakDays.textContent = `${calculateStreak()}일`;
-  els.totalVolume.textContent = `${formatNumber(totalVolume)} kg`;
-
-  renderTopExercises(entries);
-  renderRecentEntries(entries);
-}
-
-function renderTopExercises(entries) {
-  const counts = new Map();
-  entries.forEach(([, entry]) => {
-    entry.workouts.forEach((workout) => {
-      const name = (workout.name || "이름 없는 운동").trim();
-      counts.set(name, (counts.get(name) || 0) + Number(workout.sets || 1));
-    });
-  });
-  const top = Array.from(counts.entries()).sort((a, b) => b[1] - a[1]).slice(0, 5);
-  els.topExercises.innerHTML = "";
-  if (!top.length) {
-    els.topExercises.append(emptyMessage("운동을 기록하면 자주 한 종목이 보여요."));
-    return;
+  if (hasWorkout(entry)) {
+    const duration = workoutDurationText(entry);
+    els.selectedSummaryBody.append(summaryItem("운동", `${totals.sets}세트 · ${formatNumber(totals.volume)}kg${duration ? ` · ${duration}` : ""}`));
   }
-  const max = Math.max(...top.map(([, count]) => count), 1);
-  top.forEach(([name, count]) => {
-    const item = document.createElement("div");
-    item.className = "bar-item";
-    item.innerHTML = `
-      <strong>${escapeHTML(name)}</strong>
-      <span>${count}세트</span>
-      <div class="bar-track"><div class="bar-fill" style="width: ${(count / max) * 100}%"></div></div>
-    `;
-    els.topExercises.append(item);
-  });
-}
-
-function renderRecentEntries(entries) {
-  els.recentEntries.innerHTML = "";
-  if (!entries.length) {
-    els.recentEntries.append(emptyMessage("아직 기록이 없어요. 오늘부터 한 줄만 남겨도 충분해요."));
-    return;
+  if ((entry.meals || []).length) {
+    els.selectedSummaryBody.append(summaryItem("식단", `${entry.meals.length}끼 · ${formatNumber(totals.calories)}kcal`));
   }
-  entries.slice(0, 7).forEach(([date, entry]) => {
-    const totals = summarizeEntry(entry);
-    const workoutNames = entry.workouts.map((item) => item.name).filter(Boolean).slice(0, 3).join(", ");
-    const item = document.createElement("button");
-    item.type = "button";
-    item.className = "recent-item";
-    item.innerHTML = `
-      <strong>${formatShortDate(parseISODate(date))}</strong>
-      <span>${escapeHTML(workoutNames || "운동 기록 없음")} · ${totals.sets}세트 · ${formatNumber(totals.calories)}kcal</span>
-    `;
-    item.addEventListener("click", () => {
-      setSelectedDate(date, { keepCalendar: false });
-      switchView("log");
-    });
-    els.recentEntries.append(item);
-  });
+  if (body) {
+    els.selectedSummaryBody.append(summaryItem("인바디", `${emptyDash(body.weight)}kg · 근육 ${emptyDash(body.muscle)}kg · 지방 ${emptyDash(body.fatPercent)}%`));
+  }
+  if (notes.length || entry.workoutMemo) {
+    els.selectedSummaryBody.append(summaryItem("메모", `${notes.length}개${entry.workoutMemo ? " · 운동 메모 있음" : ""}`));
+  }
 }
 
 function addWorkout(values = {}) {
   const entry = currentEntry();
-  entry.workouts.push({
-    id: cryptoId(),
-    name: values.name || "",
-    weight: values.weight || "",
-    reps: values.reps || "",
-    sets: values.sets || 1
-  });
+  entry.workouts.push({ id: cryptoId(), name: values.name || "", weight: values.weight || "", reps: values.reps || "", sets: values.sets || 1 });
   scheduleSave();
   renderWorkoutList(entry.workouts);
-  renderTodaySummary();
+  renderHome();
   focusLastInput(els.workoutList, '[data-field="name"]');
-}
-
-function addMeal(values = {}) {
-  const entry = currentEntry();
-  entry.meals.push({
-    id: cryptoId(),
-    name: values.name || "",
-    calories: values.calories || ""
-  });
-  scheduleSave();
-  renderMealList(entry.meals);
-  renderTodaySummary();
-  focusLastInput(els.mealList, '[data-field="name"]');
 }
 
 function handleWorkoutInput(event) {
@@ -459,17 +450,6 @@ function handleWorkoutInput(event) {
   if (!item) return;
   item[event.target.dataset.field] = parseFieldValue(event.target);
   scheduleSave();
-  renderTodaySummary();
-}
-
-function handleMealInput(event) {
-  const row = event.target.closest(".meal-row");
-  if (!row) return;
-  const item = currentEntry().meals.find((meal) => meal.id === row.dataset.id);
-  if (!item) return;
-  item[event.target.dataset.field] = parseFieldValue(event.target);
-  scheduleSave();
-  renderTodaySummary();
 }
 
 function handleWorkoutClick(event) {
@@ -480,7 +460,55 @@ function handleWorkoutClick(event) {
   entry.workouts = entry.workouts.filter((workout) => workout.id !== row.dataset.id);
   scheduleSave();
   renderWorkoutList(entry.workouts);
-  renderTodaySummary();
+}
+
+function updateWorkoutMeta() {
+  const entry = currentEntry();
+  entry.workoutStart = els.workoutStartInput.value;
+  entry.workoutEnd = els.workoutEndInput.value;
+  renderWorkoutDuration();
+  scheduleSave();
+}
+
+function renderWorkoutDuration() {
+  els.workoutDuration.textContent = workoutDurationText(currentEntry()) || "0분";
+}
+
+function deleteWorkoutForDay() {
+  const entry = currentEntry();
+  if (!hasWorkout(entry) && !entry.workoutStart && !entry.workoutEnd && !entry.workoutMemo) {
+    showToast("삭제할 운동 기록이 없어요.");
+    return;
+  }
+  if (!window.confirm("선택한 날짜의 운동 기록을 삭제할까요?")) return;
+  entry.workouts = [];
+  entry.workoutStart = "";
+  entry.workoutEnd = "";
+  entry.workoutMemo = "";
+  entry.mood = "";
+  entry.intensity = 5;
+  persistNow();
+  renderAll();
+  showToast("운동 기록을 삭제했어요.");
+}
+
+function addMeal(values = {}) {
+  const entry = currentEntry();
+  entry.meals.push({ id: cryptoId(), type: values.type || "간식", time: values.time || "", name: values.name || "", calories: values.calories || "" });
+  scheduleSave();
+  renderMealList(entry.meals);
+  renderMealsPage();
+  focusLastInput(els.mealList, '[data-field="name"]');
+}
+
+function handleMealInput(event) {
+  const row = event.target.closest(".meal-row");
+  if (!row) return;
+  const item = currentEntry().meals.find((meal) => meal.id === row.dataset.id);
+  if (!item) return;
+  item[event.target.dataset.field] = parseFieldValue(event.target);
+  scheduleSave();
+  renderMealTotal();
 }
 
 function handleMealClick(event) {
@@ -491,7 +519,88 @@ function handleMealClick(event) {
   entry.meals = entry.meals.filter((meal) => meal.id !== row.dataset.id);
   scheduleSave();
   renderMealList(entry.meals);
-  renderTodaySummary();
+  renderMealsPage();
+}
+
+function deleteMealsForDay() {
+  const entry = currentEntry();
+  if (!entry.meals.length) {
+    showToast("삭제할 식단 기록이 없어요.");
+    return;
+  }
+  if (!window.confirm("선택한 날짜의 식단 기록을 삭제할까요?")) return;
+  entry.meals = [];
+  persistNow();
+  renderAll();
+  showToast("식단 기록을 삭제했어요.");
+}
+
+function addBodyRecord() {
+  const date = els.bodyDateInput.value || selectedDate;
+  const record = {
+    id: cryptoId(),
+    date,
+    weight: parseOptionalNumber(els.bodyWeightInput.value),
+    muscle: parseOptionalNumber(els.bodyMuscleInput.value),
+    fat: parseOptionalNumber(els.bodyFatInput.value),
+    fatPercent: parseOptionalNumber(els.bodyFatPercentInput.value),
+    memo: els.bodyMemoInput.value.trim()
+  };
+  if (!record.weight && !record.muscle && !record.fat && !record.fatPercent && !record.memo) {
+    showToast("인바디 값을 하나 이상 입력해 주세요.");
+    return;
+  }
+  state.bodyRecords.push(record);
+  els.bodyWeightInput.value = "";
+  els.bodyMuscleInput.value = "";
+  els.bodyFatInput.value = "";
+  els.bodyFatPercentInput.value = "";
+  els.bodyMemoInput.value = "";
+  persistNow();
+  renderAll();
+  showToast("인바디를 추가했어요.");
+}
+
+function handleBodyDelete(event) {
+  const button = event.target.closest("[data-id]");
+  if (!button) return;
+  state.bodyRecords = state.bodyRecords.filter((record) => record.id !== button.dataset.id);
+  persistNow();
+  renderAll();
+  showToast("인바디 기록을 삭제했어요.");
+}
+
+function addInfoNote() {
+  const title = els.infoTitleInput.value.trim();
+  const memo = els.infoMemoInput.value.trim();
+  const url = els.infoUrlInput.value.trim();
+  if (!title && !memo && !url) {
+    showToast("메모 내용을 입력해 주세요.");
+    return;
+  }
+  state.infoNotes.push({
+    id: cryptoId(),
+    date: els.infoDateInput.value || selectedDate,
+    category: els.infoCategoryInput.value,
+    title,
+    url,
+    memo
+  });
+  els.infoTitleInput.value = "";
+  els.infoUrlInput.value = "";
+  els.infoMemoInput.value = "";
+  persistNow();
+  renderAll();
+  showToast("메모를 추가했어요.");
+}
+
+function handleInfoNoteDelete(event) {
+  const button = event.target.closest("[data-id]");
+  if (!button) return;
+  state.infoNotes = state.infoNotes.filter((note) => note.id !== button.dataset.id);
+  persistNow();
+  renderAll();
+  showToast("메모를 삭제했어요.");
 }
 
 function currentEntry() {
@@ -503,37 +612,49 @@ function ensureEntry(date) {
   const entry = state.entries[date];
   entry.workouts ||= [];
   entry.meals ||= [];
-  entry.intensity ||= 5;
   entry.mood ||= "";
-  entry.note ||= "";
+  entry.intensity ||= 5;
+  entry.workoutMemo ||= entry.note || "";
+  entry.workoutStart ||= "";
+  entry.workoutEnd ||= "";
   return entry;
 }
 
 function blankEntry() {
-  return { workouts: [], meals: [], mood: "", intensity: 5, note: "" };
+  return { workouts: [], meals: [], workoutStart: "", workoutEnd: "", mood: "", intensity: 5, workoutMemo: "" };
 }
 
 function summarizeEntry(entry) {
   const workouts = entry.workouts || [];
   const meals = entry.meals || [];
   return {
-    volume: workouts.reduce((sum, item) => {
-      const weight = Number(item.weight) || 0;
-      const reps = Number(item.reps) || 0;
-      const sets = Number(item.sets) || 0;
-      return sum + weight * reps * sets;
-    }, 0),
+    volume: workouts.reduce((sum, item) => sum + (Number(item.weight) || 0) * (Number(item.reps) || 0) * (Number(item.sets) || 0), 0),
     sets: workouts.reduce((sum, item) => sum + (Number(item.sets) || 0), 0),
     calories: meals.reduce((sum, item) => sum + (Number(item.calories) || 0), 0)
   };
 }
 
-function hasEntryContent(entry) {
-  return hasWorkout(entry) || (entry.meals || []).length > 0 || Boolean((entry.note || "").trim()) || Boolean(entry.mood);
-}
-
 function hasWorkout(entry) {
   return (entry.workouts || []).some((item) => item.name || item.weight || item.reps || item.sets);
+}
+
+function hasDayContent(date) {
+  const entry = state.entries[date] || blankEntry();
+  return hasWorkout(entry) || (entry.meals || []).length > 0 || Boolean(entry.workoutMemo) || state.bodyRecords.some((record) => record.date === date) || state.infoNotes.some((note) => note.date === date);
+}
+
+function findLatestWorkout() {
+  return Object.entries(state.entries)
+    .filter(([, entry]) => hasWorkout(entry))
+    .sort(([a], [b]) => b.localeCompare(a))
+    .map(([date, entry]) => ({
+      date,
+      names: entry.workouts.map((workout) => workout.name).filter(Boolean).slice(0, 2).join(", ")
+    }))[0];
+}
+
+function latestBodyRecord() {
+  return [...state.bodyRecords].sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id))[0];
 }
 
 function scheduleSave() {
@@ -541,8 +662,10 @@ function scheduleSave() {
   window.clearTimeout(saveTimer);
   saveTimer = window.setTimeout(() => {
     persistNow();
+    renderHome();
+    renderMealTotal();
     renderCalendar();
-    renderStats();
+    renderSelectedSummary();
   }, 250);
 }
 
@@ -550,53 +673,53 @@ function persistNow(options = {}) {
   pruneEmptyEntries();
   state.selectedDate = selectedDate;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  if (!options.quiet) {
-    els.saveState.textContent = "저장됨";
-  }
+  if (!options.quiet) els.saveState.textContent = "저장됨";
 }
 
 function pruneEmptyEntries() {
   Object.keys(state.entries).forEach((date) => {
+    const entry = state.entries[date];
     if (date === selectedDate) return;
-    if (!hasEntryContent(state.entries[date])) delete state.entries[date];
+    if (!hasDayContent(date)) delete state.entries[date];
   });
 }
 
 function loadState() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { entries: {}, selectedDate: toISODate(new Date()) };
-    const parsed = JSON.parse(raw);
-    return {
-      entries: parsed.entries && typeof parsed.entries === "object" ? parsed.entries : {},
-      selectedDate: parsed.selectedDate || toISODate(new Date())
-    };
-  } catch (error) {
-    console.warn("Failed to load workout log", error);
-    return { entries: {}, selectedDate: toISODate(new Date()) };
-  }
+  const fresh = safeJSON(localStorage.getItem(STORAGE_KEY));
+  if (fresh) return normalizeState(fresh);
+  const legacy = safeJSON(localStorage.getItem(LEGACY_KEY));
+  if (legacy) return normalizeState(legacy);
+  return normalizeState({});
 }
 
-function calculateStreak() {
-  let cursor = parseISODate(toISODate(new Date()));
-  let count = 0;
-  while (true) {
-    const date = toISODate(cursor);
-    if (!state.entries[date] || !hasWorkout(state.entries[date])) break;
-    count += 1;
-    cursor = addDays(cursor, -1);
-  }
-  return count;
+function normalizeState(raw) {
+  const entries = {};
+  Object.entries(raw.entries || {}).forEach(([date, entry]) => {
+    entries[date] = {
+      workouts: (entry.workouts || []).map((workout) => ({ id: workout.id || cryptoId(), name: workout.name || "", weight: workout.weight || "", reps: workout.reps || "", sets: workout.sets || 1 })),
+      meals: (entry.meals || []).map((meal) => ({ id: meal.id || cryptoId(), type: meal.type || "간식", time: meal.time || "", name: meal.name || "", calories: meal.calories || "" })),
+      workoutStart: entry.workoutStart || "",
+      workoutEnd: entry.workoutEnd || "",
+      mood: entry.mood || "",
+      intensity: entry.intensity || 5,
+      workoutMemo: entry.workoutMemo || entry.note || ""
+    };
+  });
+  return {
+    selectedDate: raw.selectedDate || toISODate(new Date()),
+    entries,
+    bodyRecords: Array.isArray(raw.bodyRecords) ? raw.bodyRecords : [],
+    infoNotes: Array.isArray(raw.infoNotes) ? raw.infoNotes : []
+  };
 }
 
 function exportData() {
   persistNow({ quiet: true });
-  const payload = JSON.stringify({ ...state, exportedAt: new Date().toISOString() }, null, 2);
-  const blob = new Blob([payload], { type: "application/json" });
+  const blob = new Blob([JSON.stringify({ ...state, exportedAt: new Date().toISOString() }, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `my-workout-log-${toISODate(new Date())}.json`;
+  link.download = `cute-workout-log-${toISODate(new Date())}.json`;
   document.body.append(link);
   link.click();
   link.remove();
@@ -609,32 +732,21 @@ function importData(event) {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = () => {
-    try {
-      const parsed = JSON.parse(String(reader.result));
-      if (!parsed.entries || typeof parsed.entries !== "object") {
-        throw new Error("Invalid backup");
-      }
-      state = {
-        entries: parsed.entries,
-        selectedDate: parsed.selectedDate || selectedDate
-      };
-      selectedDate = state.selectedDate;
-      persistNow();
-      setSelectedDate(selectedDate, { keepCalendar: false });
-      showToast("백업을 불러왔어요.");
-    } catch (error) {
+    const parsed = safeJSON(String(reader.result));
+    if (!parsed || !parsed.entries) {
       showToast("가져올 수 없는 파일이에요.");
-    } finally {
       event.target.value = "";
+      return;
     }
+    state = normalizeState(parsed);
+    selectedDate = state.selectedDate;
+    calendarCursor = firstDayOfMonth(parseISODate(selectedDate));
+    persistNow();
+    renderAll();
+    showToast("백업을 불러왔어요.");
+    event.target.value = "";
   };
   reader.readAsText(file);
-}
-
-function registerServiceWorker() {
-  if (!("serviceWorker" in navigator)) return;
-  if (location.protocol === "file:") return;
-  navigator.serviceWorker.register("sw.js").catch(() => {});
 }
 
 function emptyMessage(message) {
@@ -657,9 +769,21 @@ function dot(type) {
   return node;
 }
 
-function focusLastInput(container, selector) {
-  const input = $$(selector, container).at(-1);
-  if (input) input.focus();
+function workoutDurationText(entry) {
+  if (!entry.workoutStart || !entry.workoutEnd) return "";
+  const start = minutesFromTime(entry.workoutStart);
+  let end = minutesFromTime(entry.workoutEnd);
+  if (end < start) end += 24 * 60;
+  const minutes = end - start;
+  if (!minutes) return "0분";
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return h ? `${h}시간 ${m ? `${m}분` : ""}`.trim() : `${m}분`;
+}
+
+function minutesFromTime(value) {
+  const [h, m] = value.split(":").map(Number);
+  return h * 60 + m;
 }
 
 function parseFieldValue(input) {
@@ -667,8 +791,21 @@ function parseFieldValue(input) {
   return input.value;
 }
 
-function cleanNumber(value) {
-  return value === "" || value === undefined || value === null ? "" : value;
+function parseOptionalNumber(value) {
+  return value === "" ? "" : Number(value);
+}
+
+function focusLastInput(container, selector) {
+  const input = $$(selector, container).at(-1);
+  if (input) input.focus();
+}
+
+function safeJSON(raw) {
+  try {
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
 }
 
 function cryptoId() {
@@ -677,10 +814,7 @@ function cryptoId() {
 }
 
 function toISODate(date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 }
 
 function parseISODate(dateString) {
@@ -714,20 +848,21 @@ function relativeDayName(date) {
 }
 
 function formatFullDate(date) {
-  return new Intl.DateTimeFormat("ko-KR", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    weekday: "short"
-  }).format(date);
+  return new Intl.DateTimeFormat("ko-KR", { year: "numeric", month: "2-digit", day: "2-digit", weekday: "short" }).format(date);
+}
+
+function formatLongDate(date) {
+  return new Intl.DateTimeFormat("ko-KR", { year: "numeric", month: "long", day: "numeric", weekday: "long" }).format(date);
 }
 
 function formatShortDate(date) {
-  return new Intl.DateTimeFormat("ko-KR", {
-    month: "long",
-    day: "numeric",
-    weekday: "short"
-  }).format(date);
+  return new Intl.DateTimeFormat("ko-KR", { month: "long", day: "numeric", weekday: "short" }).format(date);
+}
+
+function daysBetween(from, to) {
+  const a = new Date(from.getFullYear(), from.getMonth(), from.getDate());
+  const b = new Date(to.getFullYear(), to.getMonth(), to.getDate());
+  return Math.max(0, Math.round((b - a) / 86400000));
 }
 
 function formatNumber(value) {
@@ -736,6 +871,19 @@ function formatNumber(value) {
 
 function formatCompact(value) {
   return Math.round((value || 0) / 100) / 10;
+}
+
+function emptyDash(value) {
+  return value === "" || value === undefined || value === null ? "-" : value;
+}
+
+function cleanNumber(value) {
+  return value === "" || value === undefined || value === null ? "" : value;
+}
+
+function normalizeUrl(url) {
+  if (!url) return "";
+  return /^https?:\/\//i.test(url) ? url : `https://${url}`;
 }
 
 function escapeHTML(value) {
@@ -751,7 +899,10 @@ function showToast(message) {
   els.toast.textContent = message;
   els.toast.classList.add("is-visible");
   window.clearTimeout(showToast.timer);
-  showToast.timer = window.setTimeout(() => {
-    els.toast.classList.remove("is-visible");
-  }, 1800);
+  showToast.timer = window.setTimeout(() => els.toast.classList.remove("is-visible"), 1800);
+}
+
+function registerServiceWorker() {
+  if (!("serviceWorker" in navigator) || location.protocol === "file:") return;
+  navigator.serviceWorker.register("sw.js").catch(() => {});
 }

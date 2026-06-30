@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="#17181d">
-    <title>내 운동일지</title>
+    <meta name="theme-color" content="#fff7d6">
+    <title>득근일지</title>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="icon.svg">
@@ -12,49 +12,27 @@
   </head>
   <body>
     <svg class="sprite" aria-hidden="true">
-      <symbol id="icon-plus" viewBox="0 0 24 24">
-        <path d="M12 5v14M5 12h14"></path>
-      </symbol>
-      <symbol id="icon-trash" viewBox="0 0 24 24">
-        <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"></path>
-      </symbol>
-      <symbol id="icon-chevron-left" viewBox="0 0 24 24">
-        <path d="m15 18-6-6 6-6"></path>
-      </symbol>
-      <symbol id="icon-chevron-right" viewBox="0 0 24 24">
-        <path d="m9 18 6-6-6-6"></path>
-      </symbol>
-      <symbol id="icon-dumbbell" viewBox="0 0 24 24">
-        <path d="M6 7v10M18 7v10M3 9v6M21 9v6M6 12h12"></path>
-      </symbol>
-      <symbol id="icon-utensils" viewBox="0 0 24 24">
-        <path d="M6 3v8M3 3v8a3 3 0 0 0 6 0V3M16 3v18M20 3c-2.5 1.8-4 4.3-4 8h4"></path>
-      </symbol>
-      <symbol id="icon-calendar" viewBox="0 0 24 24">
-        <path d="M7 3v4M17 3v4M4 8h16M5 5h14v15H5z"></path>
-      </symbol>
-      <symbol id="icon-note" viewBox="0 0 24 24">
-        <path d="M6 3h9l3 3v15H6zM14 3v4h4M9 12h6M9 16h6"></path>
-      </symbol>
-      <symbol id="icon-chart" viewBox="0 0 24 24">
-        <path d="M4 19V5M4 19h17M8 15v-4M13 15V8M18 15v-7"></path>
-      </symbol>
-      <symbol id="icon-download" viewBox="0 0 24 24">
-        <path d="M12 3v12M7 10l5 5 5-5M5 21h14"></path>
-      </symbol>
-      <symbol id="icon-upload" viewBox="0 0 24 24">
-        <path d="M12 21V9M7 14l5-5 5 5M5 3h14"></path>
-      </symbol>
-      <symbol id="icon-check" viewBox="0 0 24 24">
-        <path d="m5 13 4 4L19 7"></path>
-      </symbol>
+      <symbol id="icon-home" viewBox="0 0 24 24"><path d="M3 10.5 12 4l9 6.5"/><path d="M5 9.5V20h14V9.5"/><path d="M9 20v-6h6v6"/></symbol>
+      <symbol id="icon-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+      <symbol id="icon-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></symbol>
+      <symbol id="icon-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+      <symbol id="icon-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+      <symbol id="icon-calendar" viewBox="0 0 24 24"><path d="M7 3v4M17 3v4M4 8h16M5 5h14v15H5z"/></symbol>
+      <symbol id="icon-dumbbell" viewBox="0 0 24 24"><path d="M6 7v10M18 7v10M3 9v6M21 9v6M6 12h12"/></symbol>
+      <symbol id="icon-food" viewBox="0 0 24 24"><path d="M6 3v8M3 3v8a3 3 0 0 0 6 0V3M16 3v18M20 3c-2.5 1.8-4 4.3-4 8h4"/></symbol>
+      <symbol id="icon-body" viewBox="0 0 24 24"><path d="M12 5a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"/><path d="M6 21c.6-4 2.9-7 6-7s5.4 3 6 7"/><path d="M8 3h8"/></symbol>
+      <symbol id="icon-note" viewBox="0 0 24 24"><path d="M6 3h9l3 3v15H6zM14 3v4h4M9 12h6M9 16h6"/></symbol>
+      <symbol id="icon-save" viewBox="0 0 24 24"><path d="M5 4h12l2 2v14H5z"/><path d="M8 4v6h8V4M8 20v-6h8v6"/></symbol>
+      <symbol id="icon-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7 0l2-2a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-2 2a5 5 0 0 0 7 7l1-1"/></symbol>
+      <symbol id="icon-download" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></symbol>
+      <symbol id="icon-upload" viewBox="0 0 24 24"><path d="M12 21V9M7 14l5-5 5 5M5 3h14"/></symbol>
     </svg>
 
     <div class="app-shell">
       <header class="app-header">
         <div>
-          <p class="eyebrow">MY TRAINING LOG</p>
-          <h1>내 운동일지</h1>
+          <p class="eyebrow">MY CUTE FIT LOG</p>
+          <h1>득근일지</h1>
         </div>
         <button class="icon-btn" id="todayBtn" type="button" aria-label="오늘로 이동" title="오늘로 이동">
           <svg><use href="#icon-calendar"></use></svg>
@@ -62,9 +40,9 @@
       </header>
 
       <main class="app-main">
-        <section class="date-panel" aria-label="선택 날짜">
+        <section class="date-panel" aria-label="기록 날짜">
           <button class="icon-btn" id="prevDayBtn" type="button" aria-label="이전 날짜">
-            <svg><use href="#icon-chevron-left"></use></svg>
+            <svg><use href="#icon-left"></use></svg>
           </button>
           <button class="date-display" id="datePickerBtn" type="button">
             <span id="selectedDayName">오늘</span>
@@ -72,30 +50,99 @@
           </button>
           <input class="hidden-date" id="dateInput" type="date" aria-label="날짜 선택">
           <button class="icon-btn" id="nextDayBtn" type="button" aria-label="다음 날짜">
-            <svg><use href="#icon-chevron-right"></use></svg>
+            <svg><use href="#icon-right"></use></svg>
           </button>
         </section>
 
-        <section class="summary-grid" aria-label="오늘 요약">
-          <article class="metric">
-            <span>운동 볼륨</span>
-            <strong id="todayVolume">0 kg</strong>
+        <section id="view-home" class="view is-active" aria-labelledby="homeTitle">
+          <article class="hero-card">
+            <div class="hero-copy">
+              <p class="eyebrow">TODAY</p>
+              <h2 id="homeTitle">오늘도 살짝만 해보자</h2>
+              <p id="todayInfo">2026년 6월 28일 일요일</p>
+            </div>
+            <div class="mascot" aria-label="운동 캐릭터">
+              <svg viewBox="0 0 170 150" role="img">
+                <path class="m-shadow" d="M31 129c23 15 85 15 108 0" />
+                <path class="m-body" d="M54 64c5-27 56-29 63 0l11 51c4 19-11 29-45 29s-49-10-45-29Z"/>
+                <path class="m-face" d="M63 58c11-22 47-22 58 0 8 16-3 44-29 44S55 74 63 58Z"/>
+                <path class="m-ear" d="M56 62 42 44c-4-5-1-12 6-11l25 5"/>
+                <path class="m-ear" d="m114 62 14-18c4-5 1-12-6-11l-25 5"/>
+                <path class="m-arm" d="M43 92 22 82M127 92l21-10"/>
+                <path class="m-bell" d="M22 72v22M148 72v22M22 83h126"/>
+                <circle class="m-eye" cx="77" cy="67" r="4"/>
+                <circle class="m-eye" cx="101" cy="67" r="4"/>
+                <path class="m-mouth" d="M83 79c5 5 13 5 18 0"/>
+                <path class="m-cheek" d="M66 78h8M108 78h8"/>
+              </svg>
+            </div>
           </article>
-          <article class="metric">
-            <span>세트</span>
-            <strong id="todaySets">0</strong>
+
+          <section class="dashboard-grid" aria-label="메인 정보">
+            <article class="info-card accent-green">
+              <span>최근 운동</span>
+              <strong id="latestWorkoutTitle">아직 기록 없음</strong>
+              <p id="latestWorkoutMeta">운동 페이지에서 시작해요</p>
+            </article>
+            <article class="info-card accent-coral">
+              <span>몸 상태</span>
+              <strong id="latestBodyTitle">인바디 없음</strong>
+              <p id="latestBodyMeta">몸 상태 페이지에서 등록</p>
+            </article>
+          </section>
+
+          <section class="today-strip" aria-label="선택 날짜 요약">
+            <article>
+              <span>운동</span>
+              <strong id="homeWorkoutSummary">0세트</strong>
+            </article>
+            <article>
+              <span>식단</span>
+              <strong id="homeMealSummary">0 kcal</strong>
+            </article>
+            <article>
+              <span>메모</span>
+              <strong id="homeNoteSummary">0개</strong>
+            </article>
+          </section>
+
+          <article class="panel calendar-panel">
+            <div class="panel-title split">
+              <div>
+                <p class="eyebrow">CALENDAR</p>
+                <h3>캘린더</h3>
+              </div>
+              <span id="monthCount" class="pill">0일 운동</span>
+            </div>
+            <div class="month-nav">
+              <button class="icon-btn" id="prevMonthBtn" type="button" aria-label="이전 달">
+                <svg><use href="#icon-left"></use></svg>
+              </button>
+              <strong id="monthLabel">2026년 6월</strong>
+              <button class="icon-btn" id="nextMonthBtn" type="button" aria-label="다음 달">
+                <svg><use href="#icon-right"></use></svg>
+              </button>
+            </div>
+            <div class="weekday-grid" aria-hidden="true">
+              <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
+            </div>
+            <div class="calendar-grid" id="calendarGrid"></div>
           </article>
-          <article class="metric">
-            <span>칼로리</span>
-            <strong id="todayCalories">0 kcal</strong>
+
+          <article class="panel">
+            <div class="panel-title">
+              <svg><use href="#icon-note"></use></svg>
+              <h3 id="selectedSummaryTitle">선택한 날</h3>
+            </div>
+            <div class="summary-list" id="selectedSummaryBody"></div>
           </article>
         </section>
 
-        <section id="view-log" class="view is-active" aria-labelledby="logTitle">
+        <section id="view-workout" class="view" aria-labelledby="workoutTitle">
           <div class="section-heading">
             <div>
-              <p class="eyebrow">DAILY ENTRY</p>
-              <h2 id="logTitle">오늘 기록</h2>
+              <p class="eyebrow">WORKOUT</p>
+              <h2 id="workoutTitle">운동 일지</h2>
             </div>
             <span class="save-state" id="saveState">저장됨</span>
           </div>
@@ -103,7 +150,19 @@
           <article class="panel">
             <div class="panel-title">
               <svg><use href="#icon-dumbbell"></use></svg>
-              <h3>운동</h3>
+              <h3>운동 시간</h3>
+            </div>
+            <div class="time-grid">
+              <label><span>시작</span><input id="workoutStartInput" type="time"></label>
+              <label><span>종료</span><input id="workoutEndInput" type="time"></label>
+              <label><span>소요</span><output id="workoutDuration">0분</output></label>
+            </div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-title">
+              <svg><use href="#icon-dumbbell"></use></svg>
+              <h3>운동 기록</h3>
             </div>
             <div class="quick-row" id="exerciseQuick"></div>
             <div class="workout-list" id="workoutList"></div>
@@ -115,128 +174,123 @@
 
           <article class="panel">
             <div class="panel-title">
-              <svg><use href="#icon-utensils"></use></svg>
-              <h3>음식 칼로리</h3>
+              <svg><use href="#icon-note"></use></svg>
+              <h3>운동 느낌</h3>
+            </div>
+            <div class="feeling-grid">
+              <label><span>컨디션</span><select id="moodInput"><option value="">선택 안 함</option><option>좋음</option><option>보통</option><option>힘듦</option><option>최고</option></select></label>
+              <label><span>강도</span><input id="intensityInput" type="range" min="1" max="10" value="5"><b id="intensityLabel">5</b></label>
+            </div>
+            <label class="note-field">
+              <span>운동 메모</span>
+              <textarea id="workoutMemoInput" rows="5" maxlength="700" placeholder="자세, 통증, 다음 증량 계획"></textarea>
+            </label>
+          </article>
+
+          <div class="action-row">
+            <button class="primary-btn" id="saveWorkoutBtn" type="button"><svg><use href="#icon-save"></use></svg>운동 저장</button>
+            <button class="ghost-btn danger" id="deleteWorkoutBtn" type="button"><svg><use href="#icon-trash"></use></svg>운동 삭제</button>
+          </div>
+        </section>
+
+        <section id="view-meals" class="view" aria-labelledby="mealsTitle">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">MEALS</p>
+              <h2 id="mealsTitle">식단 일지</h2>
+            </div>
+            <span class="pill" id="mealTotalChip">0 kcal</span>
+          </div>
+
+          <article class="panel">
+            <div class="panel-title">
+              <svg><use href="#icon-food"></use></svg>
+              <h3>식단 기록</h3>
             </div>
             <div class="quick-row" id="mealQuick"></div>
             <div class="meal-list" id="mealList"></div>
             <button class="add-btn" id="addMealBtn" type="button">
               <svg><use href="#icon-plus"></use></svg>
-              음식 추가
+              식단 추가
             </button>
-          </article>
-
-          <article class="panel">
-            <div class="panel-title">
-              <svg><use href="#icon-note"></use></svg>
-              <h3>느낌</h3>
-            </div>
-            <div class="feeling-grid">
-              <label>
-                <span>컨디션</span>
-                <select id="moodInput">
-                  <option value="">선택 안 함</option>
-                  <option value="좋음">좋음</option>
-                  <option value="보통">보통</option>
-                  <option value="힘듦">힘듦</option>
-                  <option value="최고">최고</option>
-                </select>
-              </label>
-              <label>
-                <span>운동 강도</span>
-                <input id="intensityInput" type="range" min="1" max="10" value="5">
-                <b id="intensityLabel">5</b>
-              </label>
-            </div>
-            <label class="note-field">
-              <span>그날 운동하면서 느낀 점</span>
-              <textarea id="noteInput" rows="5" maxlength="600" placeholder="예: 스쿼트 자세가 안정적이었다. 다음엔 5kg 올려보기."></textarea>
-            </label>
           </article>
 
           <div class="action-row">
-            <button class="primary-btn" id="saveBtn" type="button">
-              <svg><use href="#icon-check"></use></svg>
-              기록 저장
-            </button>
-            <button class="ghost-btn danger" id="deleteDayBtn" type="button">
-              <svg><use href="#icon-trash"></use></svg>
-              삭제
-            </button>
+            <button class="primary-btn" id="saveMealsBtn" type="button"><svg><use href="#icon-save"></use></svg>식단 저장</button>
+            <button class="ghost-btn danger" id="deleteMealsBtn" type="button"><svg><use href="#icon-trash"></use></svg>식단 삭제</button>
           </div>
         </section>
 
-        <section id="view-calendar" class="view" aria-labelledby="calendarTitle">
+        <section id="view-body" class="view" aria-labelledby="bodyTitle">
           <div class="section-heading">
             <div>
-              <p class="eyebrow">CALENDAR</p>
-              <h2 id="calendarTitle">캘린더</h2>
+              <p class="eyebrow">BODY</p>
+              <h2 id="bodyTitle">내 몸 상태</h2>
             </div>
-            <span class="month-chip" id="monthWorkoutCount">0일 운동</span>
+            <span class="pill" id="bodyHistoryCount">0개</span>
           </div>
-
-          <article class="panel calendar-panel">
-            <div class="month-nav">
-              <button class="icon-btn" id="prevMonthBtn" type="button" aria-label="이전 달">
-                <svg><use href="#icon-chevron-left"></use></svg>
-              </button>
-              <strong id="monthLabel">2026년 6월</strong>
-              <button class="icon-btn" id="nextMonthBtn" type="button" aria-label="다음 달">
-                <svg><use href="#icon-chevron-right"></use></svg>
-              </button>
-            </div>
-            <div class="weekday-grid" aria-hidden="true">
-              <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
-            </div>
-            <div class="calendar-grid" id="calendarGrid"></div>
-          </article>
-
-          <article class="panel selected-summary">
-            <div class="panel-title">
-              <svg><use href="#icon-note"></use></svg>
-              <h3 id="selectedSummaryTitle">선택한 날</h3>
-            </div>
-            <div id="selectedSummaryBody" class="summary-list"></div>
-          </article>
-        </section>
-
-        <section id="view-stats" class="view" aria-labelledby="statsTitle">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">PROGRESS</p>
-              <h2 id="statsTitle">요약</h2>
-            </div>
-          </div>
-
-          <section class="summary-grid wide" aria-label="전체 요약">
-            <article class="metric">
-              <span>이번 달 운동</span>
-              <strong id="monthWorkoutDays">0일</strong>
-            </article>
-            <article class="metric">
-              <span>연속 기록</span>
-              <strong id="streakDays">0일</strong>
-            </article>
-            <article class="metric">
-              <span>누적 볼륨</span>
-              <strong id="totalVolume">0 kg</strong>
-            </article>
-          </section>
 
           <article class="panel">
             <div class="panel-title">
-              <svg><use href="#icon-chart"></use></svg>
-              <h3>자주 한 운동</h3>
+              <svg><use href="#icon-body"></use></svg>
+              <h3>인바디 등록</h3>
             </div>
-            <div class="bar-list" id="topExercises"></div>
+            <div class="body-form">
+              <label><span>측정일</span><input id="bodyDateInput" type="date"></label>
+              <label><span>몸무게 kg</span><input id="bodyWeightInput" type="number" min="0" step="0.1" inputmode="decimal"></label>
+              <label><span>골격근량 kg</span><input id="bodyMuscleInput" type="number" min="0" step="0.1" inputmode="decimal"></label>
+              <label><span>체지방량 kg</span><input id="bodyFatInput" type="number" min="0" step="0.1" inputmode="decimal"></label>
+              <label><span>체지방률 %</span><input id="bodyFatPercentInput" type="number" min="0" step="0.1" inputmode="decimal"></label>
+            </div>
+            <label class="note-field compact">
+              <span>상태 메모</span>
+              <textarea id="bodyMemoInput" rows="3" maxlength="400" placeholder="수분, 컨디션, 측정 장소"></textarea>
+            </label>
+            <button class="primary-btn full" id="addBodyBtn" type="button"><svg><use href="#icon-plus"></use></svg>인바디 추가</button>
           </article>
 
           <article class="panel">
             <div class="panel-title">
               <svg><use href="#icon-calendar"></use></svg>
-              <h3>최근 기록</h3>
+              <h3>히스토리</h3>
             </div>
-            <div class="recent-list" id="recentEntries"></div>
+            <div class="history-list" id="bodyHistory"></div>
+          </article>
+        </section>
+
+        <section id="view-notes" class="view" aria-labelledby="notesTitle">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">MEMO</p>
+              <h2 id="notesTitle">운동 정보 메모</h2>
+            </div>
+            <span class="pill" id="noteCountChip">0개</span>
+          </div>
+
+          <article class="panel">
+            <div class="panel-title">
+              <svg><use href="#icon-note"></use></svg>
+              <h3>메모 등록</h3>
+            </div>
+            <div class="note-form">
+              <label><span>날짜</span><input id="infoDateInput" type="date"></label>
+              <label><span>분류</span><select id="infoCategoryInput"><option>보조제</option><option>운동 영상</option><option>루틴</option><option>팁</option><option>기타</option></select></label>
+              <label class="wide"><span>제목</span><input id="infoTitleInput" type="text" maxlength="80" placeholder="크레아틴 복용 메모"></label>
+              <label class="wide"><span>URL</span><input id="infoUrlInput" type="url" maxlength="400" placeholder="https://"></label>
+            </div>
+            <label class="note-field compact">
+              <span>내용</span>
+              <textarea id="infoMemoInput" rows="4" maxlength="800" placeholder="복용량, 참고할 부분, 나중에 볼 영상 포인트"></textarea>
+            </label>
+            <button class="primary-btn full" id="addInfoNoteBtn" type="button"><svg><use href="#icon-plus"></use></svg>메모 추가</button>
+          </article>
+
+          <article class="panel">
+            <div class="panel-title">
+              <svg><use href="#icon-note"></use></svg>
+              <h3>메모장</h3>
+            </div>
+            <div class="note-list" id="infoNoteList"></div>
           </article>
 
           <article class="panel">
@@ -245,79 +299,44 @@
               <h3>백업</h3>
             </div>
             <div class="backup-row">
-              <button class="ghost-btn" id="exportBtn" type="button">
-                <svg><use href="#icon-download"></use></svg>
-                내보내기
-              </button>
-              <label class="ghost-btn file-btn">
-                <svg><use href="#icon-upload"></use></svg>
-                가져오기
-                <input id="importInput" type="file" accept="application/json">
-              </label>
+              <button class="ghost-btn" id="exportBtn" type="button"><svg><use href="#icon-download"></use></svg>내보내기</button>
+              <label class="ghost-btn file-btn"><svg><use href="#icon-upload"></use></svg>가져오기<input id="importInput" type="file" accept="application/json"></label>
             </div>
           </article>
         </section>
       </main>
 
       <nav class="bottom-nav" aria-label="주 메뉴">
-        <button class="nav-btn is-active" type="button" data-view="log">
-          <svg><use href="#icon-dumbbell"></use></svg>
-          <span>기록</span>
-        </button>
-        <button class="nav-btn" type="button" data-view="calendar">
-          <svg><use href="#icon-calendar"></use></svg>
-          <span>캘린더</span>
-        </button>
-        <button class="nav-btn" type="button" data-view="stats">
-          <svg><use href="#icon-chart"></use></svg>
-          <span>요약</span>
-        </button>
+        <button class="nav-btn is-active" type="button" data-view="home"><svg><use href="#icon-home"></use></svg><span>홈</span></button>
+        <button class="nav-btn" type="button" data-view="workout"><svg><use href="#icon-dumbbell"></use></svg><span>운동</span></button>
+        <button class="nav-btn" type="button" data-view="meals"><svg><use href="#icon-food"></use></svg><span>식단</span></button>
+        <button class="nav-btn" type="button" data-view="body"><svg><use href="#icon-body"></use></svg><span>인바디</span></button>
+        <button class="nav-btn" type="button" data-view="notes"><svg><use href="#icon-note"></use></svg><span>메모</span></button>
       </nav>
     </div>
 
     <template id="workoutTemplate">
       <div class="entry-row workout-row" data-id="">
-        <label class="field name-field">
-          <span>운동명</span>
-          <input type="text" data-field="name" list="exerciseNames" placeholder="벤치프레스">
-        </label>
-        <label class="field small-field">
-          <span>kg</span>
-          <input type="number" data-field="weight" min="0" step="0.5" inputmode="decimal" placeholder="0">
-        </label>
-        <label class="field small-field">
-          <span>횟수</span>
-          <input type="number" data-field="reps" min="0" step="1" inputmode="numeric" placeholder="0">
-        </label>
-        <label class="field small-field">
-          <span>세트</span>
-          <input type="number" data-field="sets" min="0" step="1" inputmode="numeric" placeholder="1">
-        </label>
-        <button class="icon-btn remove-row" type="button" aria-label="운동 삭제">
-          <svg><use href="#icon-trash"></use></svg>
-        </button>
+        <label class="field name-field"><span>운동명</span><input type="text" data-field="name" list="exerciseNames" placeholder="스쿼트"></label>
+        <label class="field small-field"><span>kg</span><input type="number" data-field="weight" min="0" step="0.5" inputmode="decimal"></label>
+        <label class="field small-field"><span>횟수</span><input type="number" data-field="reps" min="0" step="1" inputmode="numeric"></label>
+        <label class="field small-field"><span>세트</span><input type="number" data-field="sets" min="0" step="1" inputmode="numeric"></label>
+        <button class="icon-btn remove-row" type="button" aria-label="운동 삭제"><svg><use href="#icon-trash"></use></svg></button>
       </div>
     </template>
 
     <template id="mealTemplate">
-      <div class="entry-row meal-row" data-id="">
-        <label class="field name-field">
-          <span>음식</span>
-          <input type="text" data-field="name" placeholder="닭가슴살 샐러드">
-        </label>
-        <label class="field calorie-field">
-          <span>kcal</span>
-          <input type="number" data-field="calories" min="0" step="1" inputmode="numeric" placeholder="0">
-        </label>
-        <button class="icon-btn remove-row" type="button" aria-label="음식 삭제">
-          <svg><use href="#icon-trash"></use></svg>
-        </button>
+      <div class="meal-row" data-id="">
+        <label class="field meal-type"><span>구분</span><select data-field="type"><option>아침</option><option>점심</option><option>저녁</option><option>간식</option><option>야식</option></select></label>
+        <label class="field meal-time"><span>시간</span><input type="time" data-field="time"></label>
+        <label class="field meal-name"><span>음식</span><input type="text" data-field="name" placeholder="닭가슴살 샐러드"></label>
+        <label class="field meal-kcal"><span>kcal</span><input type="number" data-field="calories" min="0" step="1" inputmode="numeric"></label>
+        <button class="icon-btn remove-row" type="button" aria-label="식단 삭제"><svg><use href="#icon-trash"></use></svg></button>
       </div>
     </template>
 
     <datalist id="exerciseNames"></datalist>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
     <script src="app.js"></script>
   </body>
 </html>
