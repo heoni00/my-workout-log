@@ -2,6 +2,7 @@
   "name": "득근일지",
   "short_name": "득근일지",
   "description": "운동, 식단, 인바디, 운동 정보 메모를 날짜별로 기록하는 개인 운동일지",
+  "id": "./",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
@@ -27,12 +28,6 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
-    },
-    {
-      "src": "icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
     }
   ]
 }
