@@ -134,6 +134,10 @@ svg {
   margin-bottom: 12px;
 }
 
+.date-panel.is-hidden {
+  display: none;
+}
+
 .date-display {
   min-width: 0;
   border: 2px solid var(--ink);
@@ -192,7 +196,7 @@ svg {
 .hero-card,
 .panel,
 .info-card,
-.today-strip article {
+.summary-action-card {
   border: 2px solid var(--ink);
   border-radius: 8px;
   box-shadow: 4px 4px 0 var(--ink);
@@ -282,10 +286,12 @@ svg {
 }
 
 .info-card,
-.today-strip article {
+.summary-action-card {
   min-width: 0;
+  color: var(--ink);
   background: var(--panel);
   padding: 13px 12px;
+  text-align: left;
 }
 
 .accent-green {
@@ -689,6 +695,20 @@ output {
 
 .summary-item {
   display: block;
+  width: 100%;
+  border: 0;
+  color: var(--ink);
+  text-align: left;
+}
+
+button.summary-item,
+.note-item {
+  cursor: pointer;
+}
+
+button.summary-item:hover,
+.note-item:hover {
+  background: #fff4bb;
 }
 
 .summary-item strong,
@@ -712,6 +732,13 @@ output {
 .history-item p,
 .note-item p {
   margin: 6px 0 0;
+}
+
+.note-preview {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .note-topline {
@@ -738,6 +765,134 @@ output {
   width: 14px;
   height: 14px;
   flex: 0 0 auto;
+}
+
+.note-actions {
+  display: flex;
+  gap: 6px;
+  align-self: start;
+}
+
+.note-star {
+  width: 40px;
+  color: #aa8a17;
+  background: #fff8e8;
+  box-shadow: none;
+}
+
+.note-star svg {
+  fill: transparent;
+}
+
+.note-star.is-active {
+  border-color: #d9a900;
+  color: #d9a900;
+  background: #fff4bb;
+}
+
+.note-star.is-active svg {
+  fill: currentColor;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+  min-height: 34px;
+  margin-top: 12px;
+}
+
+.page-btn {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fffaf0;
+  color: var(--ink-soft);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.page-btn.is-active {
+  border-color: var(--ink);
+  color: var(--ink);
+  background: var(--mint);
+  box-shadow: 2px 2px 0 var(--ink);
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: end center;
+  padding: 16px;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(35, 33, 42, 0.42);
+}
+
+.modal-card {
+  position: relative;
+  width: min(100%, 430px);
+  max-height: min(76vh, 620px);
+  overflow: auto;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: 4px 4px 0 var(--ink);
+  padding: 16px;
+}
+
+.modal-head {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.modal-head h2 {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.25;
+}
+
+#closeNoteDetailBtn {
+  box-shadow: none;
+}
+
+#noteDetailDate {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--ink-soft);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+#noteDetailMemo {
+  margin: 0 0 12px;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+#noteDetailUrl {
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  color: #1e6bb1;
+  font-size: 13px;
+  font-weight: 900;
+  overflow-wrap: anywhere;
 }
 
 .empty {

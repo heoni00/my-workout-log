@@ -1,5 +1,7 @@
 const STORAGE_KEY = "my-workout-log-v2";
 const LEGACY_KEY = "my-workout-log-v1";
+const APP_VERSION = "0.4.0";
+const MEMO_PAGE_SIZE = 5;
 
 const exercisePresets = ["스쿼트", "벤치프레스", "데드리프트", "숄더프레스", "랫풀다운", "바벨로우", "런지", "러닝"];
 const mealPresets = [
@@ -8,11 +10,45 @@ const mealPresets = [
   { type: "저녁", time: "19:00", name: "연어 샐러드", calories: 430 },
   { type: "간식", time: "16:00", name: "프로틴", calories: 120 }
 ];
+const workoutQuotes = [
+  "어제보다 한 번만 더.",
+  "땀은 몸이 쓰는 성장 일기야.",
+  "오늘의 작은 반복이 내일의 체력이 된다.",
+  "무거운 하루도 한 세트씩 들면 된다.",
+  "시작한 사람이 이미 절반은 이겼다.",
+  "몸은 정직해서 쌓은 만큼 대답한다.",
+  "쉬운 날에도 출석하면 이긴 날이다.",
+  "기록은 나를 혼내는 게 아니라 키우는 도구다.",
+  "완벽한 운동보다 끝낸 운동이 더 강하다.",
+  "천천히 가도 멈추지 않으면 루틴이 된다.",
+  "오늘 든 무게가 내일의 기준을 만든다.",
+  "숨이 차오를 때 몸은 새 길을 배운다.",
+  "작게 해도 꾸준하면 몸은 알아차린다.",
+  "운동은 나와 친해지는 가장 단단한 약속이다.",
+  "힘든 건 실패가 아니라 적응 중이라는 뜻.",
+  "한 세트 더는 자신감의 다른 이름이다.",
+  "근육은 조용히 쌓이고 어느 날 크게 보인다.",
+  "잘 쉬는 것도 좋은 훈련의 일부다.",
+  "오늘의 자세가 내일의 부상을 막는다.",
+  "비교는 어제의 나와만 해도 충분하다.",
+  "몸을 움직이면 마음도 같이 정리된다.",
+  "기록한 운동은 사라지지 않는 성취다.",
+  "작은 증량도 분명한 전진이다.",
+  "꾸준함은 가장 귀여운 반칙이다.",
+  "땀 한 방울마다 내가 조금 더 내 편이 된다.",
+  "가볍게 시작해도 끝나면 단단해진다.",
+  "포기하고 싶은 순간은 루틴이 뿌리내리는 순간이다.",
+  "오늘의 운동은 미래의 내가 받는 선물이다.",
+  "몸은 재촉보다 반복을 믿는다.",
+  "운동화 끈을 묶은 순간 이미 흐름은 시작됐다."
+];
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
 
 const els = {
+  datePanel: $(".date-panel"),
+  homeTitle: $("#homeTitle"),
   todayBtn: $("#todayBtn"),
   prevDayBtn: $("#prevDayBtn"),
   nextDayBtn: $("#nextDayBtn"),
@@ -25,6 +61,9 @@ const els = {
   latestWorkoutMeta: $("#latestWorkoutMeta"),
   latestBodyTitle: $("#latestBodyTitle"),
   latestBodyMeta: $("#latestBodyMeta"),
+  homeWorkoutCard: $("#homeWorkoutCard"),
+  homeMealCard: $("#homeMealCard"),
+  homeMemoCard: $("#homeMemoCard"),
   homeWorkoutSummary: $("#homeWorkoutSummary"),
   homeMealSummary: $("#homeMealSummary"),
   homeNoteSummary: $("#homeNoteSummary"),
@@ -71,6 +110,14 @@ const els = {
   infoMemoInput: $("#infoMemoInput"),
   addInfoNoteBtn: $("#addInfoNoteBtn"),
   infoNoteList: $("#infoNoteList"),
+  notePagination: $("#notePagination"),
+  noteDetailModal: $("#noteDetailModal"),
+  closeNoteDetailBtn: $("#closeNoteDetailBtn"),
+  noteDetailCategory: $("#noteDetailCategory"),
+  noteDetailTitle: $("#noteDetailTitle"),
+  noteDetailDate: $("#noteDetailDate"),
+  noteDetailMemo: $("#noteDetailMemo"),
+  noteDetailUrl: $("#noteDetailUrl"),
   exportBtn: $("#exportBtn"),
   importInput: $("#importInput"),
   workoutTemplate: $("#workoutTemplate"),
@@ -80,18 +127,20 @@ const els = {
 };
 
 let state = loadState();
-let selectedDate = state.selectedDate || toISODate(new Date());
+let selectedDate = toISODate(new Date());
 let calendarCursor = firstDayOfMonth(parseISODate(selectedDate));
 let saveTimer = 0;
+let memoPage = 1;
 
 init();
 
 function init() {
+  document.documentElement.dataset.appVersion = APP_VERSION;
   renderPresetButtons();
   renderExerciseDatalist();
   bindEvents();
-  switchView("home");
   setSelectedDate(selectedDate, { keepCalendar: false, quiet: true });
+  switchView("home");
   registerServiceWorker();
 }
 
@@ -120,6 +169,10 @@ function bindEvents() {
     if (!day) return;
     setSelectedDate(day.dataset.date, { keepCalendar: true });
   });
+  els.selectedSummaryBody.addEventListener("click", handleSelectedSummaryClick);
+  els.homeWorkoutCard.addEventListener("click", () => switchView("workout"));
+  els.homeMealCard.addEventListener("click", () => switchView("meals"));
+  els.homeMemoCard.addEventListener("click", () => switchView("notes"));
 
   $$(".nav-btn").forEach((button) => button.addEventListener("click", () => switchView(button.dataset.view)));
 
@@ -160,7 +213,15 @@ function bindEvents() {
   els.addBodyBtn.addEventListener("click", addBodyRecord);
   els.bodyHistory.addEventListener("click", handleBodyDelete);
   els.addInfoNoteBtn.addEventListener("click", addInfoNote);
-  els.infoNoteList.addEventListener("click", handleInfoNoteDelete);
+  els.infoNoteList.addEventListener("click", handleInfoNoteClick);
+  els.notePagination.addEventListener("click", handleNotePagination);
+  els.closeNoteDetailBtn.addEventListener("click", closeNoteDetail);
+  els.noteDetailModal.addEventListener("click", (event) => {
+    if (event.target.dataset.closeNote) closeNoteDetail();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeNoteDetail();
+  });
 
   els.exportBtn.addEventListener("click", exportData);
   els.importInput.addEventListener("change", importData);
@@ -195,8 +256,10 @@ function renderExerciseDatalist() {
 }
 
 function switchView(viewName) {
+  if (viewName === "home") els.homeTitle.textContent = randomWorkoutQuote();
   $$(".view").forEach((view) => view.classList.toggle("is-active", view.id === `view-${viewName}`));
   $$(".nav-btn").forEach((button) => button.classList.toggle("is-active", button.dataset.view === viewName));
+  els.datePanel.classList.toggle("is-hidden", viewName === "body" || viewName === "notes");
   renderAll();
 }
 
@@ -205,8 +268,6 @@ function setSelectedDate(dateString, options = {}) {
   state.selectedDate = selectedDate;
   ensureEntry(selectedDate);
   els.dateInput.value = selectedDate;
-  els.bodyDateInput.value = selectedDate;
-  els.infoDateInput.value = selectedDate;
   if (!options.keepCalendar) calendarCursor = firstDayOfMonth(parseISODate(selectedDate));
   persistNow({ quiet: options.quiet ?? true });
   renderAll();
@@ -319,7 +380,7 @@ function renderMealList(meals) {
 }
 
 function renderBodyPage() {
-  els.bodyDateInput.value ||= selectedDate;
+  els.bodyDateInput.value ||= toISODate(new Date());
   els.bodyHistoryCount.textContent = `${state.bodyRecords.length}개`;
   els.bodyHistory.innerHTML = "";
   const records = [...state.bodyRecords].sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
@@ -343,26 +404,33 @@ function renderBodyPage() {
 }
 
 function renderNotesPage() {
-  els.infoDateInput.value ||= selectedDate;
+  els.infoDateInput.value ||= toISODate(new Date());
   els.noteCountChip.textContent = `${state.infoNotes.length}개`;
   els.infoNoteList.innerHTML = "";
-  const notes = [...state.infoNotes].sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
+  const notes = sortedInfoNotes();
+  const totalPages = Math.max(1, Math.ceil(notes.length / MEMO_PAGE_SIZE));
+  memoPage = Math.min(memoPage, totalPages);
+  renderNotePagination(notes.length, totalPages);
   if (!notes.length) {
     els.infoNoteList.append(emptyMessage("저장한 메모가 없어요."));
     return;
   }
-  notes.forEach((note) => {
+  notes.slice((memoPage - 1) * MEMO_PAGE_SIZE, memoPage * MEMO_PAGE_SIZE).forEach((note) => {
     const item = document.createElement("article");
     item.className = "note-item";
+    item.dataset.id = note.id;
     const url = normalizeUrl(note.url || "");
     item.innerHTML = `
       <div>
         <div class="note-topline"><span>${escapeHTML(note.category || "기타")}</span><time>${escapeHTML(formatShortDate(parseISODate(note.date)))}</time></div>
         <strong>${escapeHTML(note.title || "제목 없음")}</strong>
-        ${note.memo ? `<p>${escapeHTML(note.memo)}</p>` : ""}
+        ${note.memo ? `<p class="note-preview">${escapeHTML(note.memo)}</p>` : `<p class="note-preview">내용 없음</p>`}
         ${url ? `<a href="${escapeHTML(url)}" target="_blank" rel="noopener"><svg><use href="#icon-link"></use></svg>${escapeHTML(url)}</a>` : ""}
       </div>
-      <button class="icon-btn remove-row" type="button" data-id="${note.id}" aria-label="메모 삭제"><svg><use href="#icon-trash"></use></svg></button>
+      <div class="note-actions">
+        <button class="icon-btn note-star ${note.important ? "is-active" : ""}" type="button" data-star-id="${note.id}" aria-label="${note.important ? "중요 메모 해제" : "중요 메모 설정"}" title="${note.important ? "중요 해제" : "중요 표시"}"><svg><use href="#icon-star"></use></svg></button>
+        <button class="icon-btn remove-row" type="button" data-remove-id="${note.id}" aria-label="메모 삭제"><svg><use href="#icon-trash"></use></svg></button>
+      </div>
     `;
     els.infoNoteList.append(item);
   });
@@ -421,16 +489,16 @@ function renderSelectedSummary() {
   }
   if (hasWorkout(entry)) {
     const duration = workoutDurationText(entry);
-    els.selectedSummaryBody.append(summaryItem("운동", `${totals.sets}세트 · ${formatNumber(totals.volume)}kg${duration ? ` · ${duration}` : ""}`));
+    els.selectedSummaryBody.append(summaryItem("운동", `${totals.sets}세트 · ${formatNumber(totals.volume)}kg${duration ? ` · ${duration}` : ""}`, "workout"));
   }
   if ((entry.meals || []).length) {
-    els.selectedSummaryBody.append(summaryItem("식단", `${entry.meals.length}끼 · ${formatNumber(totals.calories)}kcal`));
+    els.selectedSummaryBody.append(summaryItem("식단", `${entry.meals.length}끼 · ${formatNumber(totals.calories)}kcal`, "meals"));
   }
   if (body) {
-    els.selectedSummaryBody.append(summaryItem("인바디", `${emptyDash(body.weight)}kg · 근육 ${emptyDash(body.muscle)}kg · 지방 ${emptyDash(body.fatPercent)}%`));
+    els.selectedSummaryBody.append(summaryItem("인바디", `${emptyDash(body.weight)}kg · 근육 ${emptyDash(body.muscle)}kg · 지방 ${emptyDash(body.fatPercent)}%`, "body"));
   }
   if (notes.length || entry.workoutMemo) {
-    els.selectedSummaryBody.append(summaryItem("메모", `${notes.length}개${entry.workoutMemo ? " · 운동 메모 있음" : ""}`));
+    els.selectedSummaryBody.append(summaryItem("메모", `${notes.length}개${entry.workoutMemo ? " · 운동 메모 있음" : ""}`, "notes"));
   }
 }
 
@@ -536,7 +604,7 @@ function deleteMealsForDay() {
 }
 
 function addBodyRecord() {
-  const date = els.bodyDateInput.value || selectedDate;
+  const date = els.bodyDateInput.value || toISODate(new Date());
   const record = {
     id: cryptoId(),
     date,
@@ -580,12 +648,14 @@ function addInfoNote() {
   }
   state.infoNotes.push({
     id: cryptoId(),
-    date: els.infoDateInput.value || selectedDate,
+    date: els.infoDateInput.value || toISODate(new Date()),
     category: els.infoCategoryInput.value,
     title,
     url,
-    memo
+    memo,
+    important: false
   });
+  memoPage = 1;
   els.infoTitleInput.value = "";
   els.infoUrlInput.value = "";
   els.infoMemoInput.value = "";
@@ -594,13 +664,64 @@ function addInfoNote() {
   showToast("메모를 추가했어요.");
 }
 
-function handleInfoNoteDelete(event) {
-  const button = event.target.closest("[data-id]");
-  if (!button) return;
-  state.infoNotes = state.infoNotes.filter((note) => note.id !== button.dataset.id);
+function handleInfoNoteClick(event) {
+  const starButton = event.target.closest("[data-star-id]");
+  if (starButton) {
+    toggleInfoNoteImportant(starButton.dataset.starId);
+    return;
+  }
+  const removeButton = event.target.closest("[data-remove-id]");
+  if (removeButton) {
+    state.infoNotes = state.infoNotes.filter((note) => note.id !== removeButton.dataset.removeId);
+    persistNow();
+    renderAll();
+    showToast("메모를 삭제했어요.");
+    return;
+  }
+  if (event.target.closest("a")) return;
+  const item = event.target.closest(".note-item");
+  if (item) openNoteDetail(item.dataset.id);
+}
+
+function toggleInfoNoteImportant(id) {
+  const note = state.infoNotes.find((item) => item.id === id);
+  if (!note) return;
+  note.important = !note.important;
+  memoPage = 1;
   persistNow();
   renderAll();
-  showToast("메모를 삭제했어요.");
+  showToast(note.important ? "중요 메모로 올렸어요." : "중요 표시를 해제했어요.");
+}
+
+function handleNotePagination(event) {
+  const button = event.target.closest("[data-page]");
+  if (!button) return;
+  memoPage = Number(button.dataset.page);
+  renderNotesPage();
+}
+
+function handleSelectedSummaryClick(event) {
+  const item = event.target.closest("[data-summary-action]");
+  if (!item) return;
+  switchView(item.dataset.summaryAction);
+}
+
+function openNoteDetail(id) {
+  const note = state.infoNotes.find((item) => item.id === id);
+  if (!note) return;
+  const url = normalizeUrl(note.url || "");
+  els.noteDetailCategory.textContent = `${note.important ? "중요 " : ""}${note.category || "기타"}`;
+  els.noteDetailTitle.textContent = note.title || "제목 없음";
+  els.noteDetailDate.textContent = formatShortDate(parseISODate(note.date));
+  els.noteDetailMemo.textContent = note.memo || "내용이 비어 있어요.";
+  els.noteDetailUrl.href = url || "#";
+  $("span", els.noteDetailUrl).textContent = url;
+  els.noteDetailUrl.style.display = url ? "inline-flex" : "none";
+  els.noteDetailModal.classList.remove("hidden");
+}
+
+function closeNoteDetail() {
+  els.noteDetailModal.classList.add("hidden");
 }
 
 function currentEntry() {
@@ -657,6 +778,17 @@ function latestBodyRecord() {
   return [...state.bodyRecords].sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id))[0];
 }
 
+function sortedInfoNotes() {
+  return [...state.infoNotes].sort((a, b) => {
+    if (Boolean(a.important) !== Boolean(b.important)) return a.important ? -1 : 1;
+    return b.date.localeCompare(a.date) || b.id.localeCompare(a.id);
+  });
+}
+
+function randomWorkoutQuote() {
+  return workoutQuotes[Math.floor(Math.random() * workoutQuotes.length)];
+}
+
 function scheduleSave() {
   els.saveState.textContent = "저장 중";
   window.clearTimeout(saveTimer);
@@ -693,6 +825,7 @@ function loadState() {
 }
 
 function normalizeState(raw) {
+  const today = toISODate(new Date());
   const entries = {};
   Object.entries(raw.entries || {}).forEach(([date, entry]) => {
     entries[date] = {
@@ -706,16 +839,37 @@ function normalizeState(raw) {
     };
   });
   return {
-    selectedDate: raw.selectedDate || toISODate(new Date()),
+    appVersion: raw.appVersion || APP_VERSION,
+    selectedDate: raw.selectedDate || today,
     entries,
-    bodyRecords: Array.isArray(raw.bodyRecords) ? raw.bodyRecords : [],
-    infoNotes: Array.isArray(raw.infoNotes) ? raw.infoNotes : []
+    bodyRecords: Array.isArray(raw.bodyRecords)
+      ? raw.bodyRecords.map((record) => ({
+          id: record.id || cryptoId(),
+          date: record.date || today,
+          weight: record.weight ?? "",
+          muscle: record.muscle ?? "",
+          fat: record.fat ?? "",
+          fatPercent: record.fatPercent ?? "",
+          memo: record.memo || ""
+        }))
+      : [],
+    infoNotes: Array.isArray(raw.infoNotes)
+      ? raw.infoNotes.map((note) => ({
+          id: note.id || cryptoId(),
+          date: note.date || today,
+          category: note.category || "기타",
+          title: note.title || "",
+          url: note.url || "",
+          memo: note.memo || "",
+          important: Boolean(note.important)
+        }))
+      : []
   };
 }
 
 function exportData() {
   persistNow({ quiet: true });
-  const blob = new Blob([JSON.stringify({ ...state, exportedAt: new Date().toISOString() }, null, 2)], { type: "application/json" });
+  const blob = new Blob([JSON.stringify({ ...state, appVersion: APP_VERSION, exportedAt: new Date().toISOString() }, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
@@ -739,7 +893,8 @@ function importData(event) {
       return;
     }
     state = normalizeState(parsed);
-    selectedDate = state.selectedDate;
+    selectedDate = toISODate(new Date());
+    state.selectedDate = selectedDate;
     calendarCursor = firstDayOfMonth(parseISODate(selectedDate));
     persistNow();
     renderAll();
@@ -756,11 +911,31 @@ function emptyMessage(message) {
   return node;
 }
 
-function summaryItem(title, text) {
-  const node = document.createElement("div");
+function summaryItem(title, text, action) {
+  const node = document.createElement(action ? "button" : "div");
   node.className = "summary-item";
+  if (action) {
+    node.type = "button";
+    node.dataset.summaryAction = action;
+    node.setAttribute("aria-label", `${title} 상세 보기`);
+  }
   node.innerHTML = `<strong>${escapeHTML(title)}</strong><span>${escapeHTML(text)}</span>`;
   return node;
+}
+
+function renderNotePagination(totalNotes, totalPages) {
+  els.notePagination.innerHTML = "";
+  if (totalNotes <= MEMO_PAGE_SIZE) return;
+  for (let page = 1; page <= totalPages; page += 1) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "page-btn";
+    button.classList.toggle("is-active", page === memoPage);
+    button.dataset.page = String(page);
+    button.textContent = String(page);
+    button.setAttribute("aria-label", `${page}페이지`);
+    els.notePagination.append(button);
+  }
 }
 
 function dot(type) {
